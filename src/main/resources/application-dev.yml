@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/sante
+    username: postgres
+    password: BTB
+  jpa:
+    hibernate:
+      #ddl-auto: <create | create-drop | update | validate | none>
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+
