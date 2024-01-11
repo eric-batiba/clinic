@@ -57,7 +57,7 @@ public class PatientService implements Ipatient {
     @Override
     public Optional<PatientResponseDto> findById(Long id) {
         log.info(PATIENT_SERVICE + " with id{} :: findById()",id);
-        return Optional.ofNullable(mapper.toDto(getPatient(id)));
+        return Optional.of(mapper.toDto(getPatient(id)));
     }
 
     @Override

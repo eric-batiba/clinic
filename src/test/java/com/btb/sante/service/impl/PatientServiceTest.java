@@ -14,7 +14,6 @@ import com.btb.sante.repository.ConsultationRepository;
 import com.btb.sante.repository.ExamenRepository;
 import com.btb.sante.repository.NotificationRepository;
 import com.btb.sante.repository.PatientRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,11 +22,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -47,6 +47,7 @@ class PatientServiceTest {
     private AutoCloseable autoCloseable;
     PatientRequestDto patientRequestDto;
     PatientResponseDto patientResponseDto;
+    PatientResponseDto patientResponseDtoUpdate;
     Patient patient;
     Examen examen;
     Consultation consultation;
@@ -111,6 +112,27 @@ class PatientServiceTest {
                 .email("biagul@gmail.com")
                 .telephone(12345)
                 .build();
+        patientResponseDtoUpdate = PatientResponseDto.builder()
+                .addressResponseDto(AddressResponseDto.builder()
+                        .address1("8685 rue de la bonne entente")
+                        .pays("canada")
+                        .ville("Quebec city")
+                        .zipCode("G2K 1C6")
+                        .build())
+                .examenResponseDto(ExamenResponseDto.builder()
+                        .categoryResponseDto(CategoryResponseDto.builder()
+                                .id(1L)
+                                .nomCategory("labo").nomService("labo")
+                                .build())
+                        .prix(new BigDecimal(15_000))
+                        .nom("palu")
+                        .pourcentage(5.0)
+                        .build())
+                .nom("Axel")
+                .prenom("mp")
+                .email("biagul@gmail.com")
+                .telephone(12345)
+                .build();
          consultation = Consultation.builder()
                 .id(ConsultationId.builder().examenId(1L).patientId(1L).build())
                 .patient(patient)
@@ -163,18 +185,81 @@ class PatientServiceTest {
                 .hasMessageContaining(String.format("exam with %s not fond", patientRequestDto.getNomExam()));
     }
     @Test
-    void findAll() {
+    void should_not_found_by_id() {
+        Long id = 1L;
+        //mock cal
+        when(patientRepository.findById(id)).thenReturn(Optional.empty());
+        //when, then
+        assertThatThrownBy(()->patientService.findById(id))
+                .isInstanceOf(PatientNoFoundException.class)
+                .hasMessageContaining(String.format("le patient %s n'a pas ete trouvé", id));
+    }
+    @Test
+    void should_find_By_Id() {
+        Long id = 1L;
+        //mock call
+        when(patientRepository.findById(id)).thenReturn(Optional.of(patient));
+        when(mapper.toDto(patient)).thenReturn(patientResponseDto);
+        //WHEN
+        Optional<PatientResponseDto> responseDto = patientService.findById(id);
+        //THEN
+        assertTrue(responseDto.isPresent());
+        assertEquals(patient.getNom(),responseDto.get().getNom());
+        //VERIFY
+        verify(patientRepository,times(1)).findById(id);
+
+    }
+    @Test
+    void should_find_All() {
+        List<Patient> patients = new ArrayList<>();
+        patients.add(patient);
+        when(patientRepository.findAll()).thenReturn(patients);
+        when(mapper.toDto(patient)).thenReturn(patientResponseDto);
+        //WHEN
+        List<PatientResponseDto> responseDto = patientService.findAll();
+        //THEN
+        assertEquals(patients.size(),responseDto.size());
+        verify(patientRepository,times(1)).findAll();
+        verify(mapper,times(1)).toDto(any());
+
+    }
+
+
+    @Test
+    void should_update() throws ExamenNotFoundException {
+        Long id = 1L;
+        String nomExam = "palu";
+        Patient patientSaved = patient;
+        patientSaved.setId(1L);
+
+        //mock call
+        when(patientRepository.findById(id)).thenReturn(Optional.of(patient));
+        when(examenRepository.findByNom(nomExam)).thenReturn(Optional.of(examen));
+        when(mapper.toEntity(patientRequestDto)).thenReturn(patient);
+        when(patientRepository.save(patient)).thenReturn(patientSaved);
+        when(mapper.toDto(patientSaved)).thenReturn(patientResponseDtoUpdate);
+        //WHEN
+        PatientResponseDto responseDto = patientService.update(patientRequestDto, id);
+        //THEN
+        assertNotEquals(patient.getNom(),responseDto.getNom());
+        assertEquals(patientRequestDto.getNomExam(),responseDto.getExamenResponseDto().getNom());
+        verify(patientRepository,times(1)).findById(id);
+        verify(patientRepository,times(1)).save(any());
+        verify(examenRepository,times(1)).findByNom(nomExam);
+        verify(mapper,times(1)).toEntity(any());
+        verify(mapper,times(1)).toDto(any());
+
     }
 
     @Test
-    void findById() {
-    }
+    void should_delete_by_id() {
+        Long id = 1L;
+        when(patientRepository.findById(id)).thenReturn(Optional.of(patient));
+        doNothing().when(patientRepository).deleteById(id);
+        //WHEN
+        patientService.delete(id);
+        //VERIFY
+        verify(patientRepository,times(1)).deleteById(id);
 
-    @Test
-    void update() {
-    }
-
-    @Test
-    void delete() {
     }
 }
