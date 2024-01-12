@@ -59,6 +59,3 @@ jobs:
         dockerfile: Dockerfile
         push: true
         tags: ${{secrets.DOCKERHUB_USERNAME}}/clinic-app:latest
-
-
-
