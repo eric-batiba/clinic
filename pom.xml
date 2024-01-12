@@ -109,6 +109,7 @@
 			</plugin>
 
 		</plugins>
+		<finalName>clinic-app</finalName>
 	</build>
 
 </project>
