@@ -47,28 +47,23 @@ jobs:
 
    # - name: remove pom.xml
    #   run: rm -f pom.xml
+    - name: sonar goal with maven
+      run: |
+        mvn --batch-mode --update-snapshots verify -B verify sonar:sonar
 
     - name: SonarCloud Scan
-
       uses: sonarsource/sonarcloud-github-action@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: |
-        mvn --batch-mode --update-snapshots verify -B verify sonar:sonar 
-        -Dsonar.projectKey=eric-batiba_clinic
-        -Dsonar.organization=eric-batiba 
-        -Dsonar.host.url=https://sonarcloud.io 
-        -Dsonar.login=${{ secrets.SONAR_TOKEN }} 
-        -Dsonar.tests=src/test/java/com/btb/sante/service/impl
-
-     # with:
-     #   args: >
-      #    -Dsonar.organization=eric-batiba
-     #     -Dsonar.projectKey=eric-batiba_clinic
+      with:
+        args: >
+          -Dsonar.projectKey=eric-batiba_clinic
+           -Dsonar.organization=eric-batiba 
+           -Dsonar.host.url=https://sonarcloud.io 
+           -Dsonar.login=${{ secrets.SONAR_TOKEN }} 
+           -Dsonar.tests=src/test/java/com/btb/sante/service/impl
       
-      
-
 
     - name: Build with Maven
       run: |
