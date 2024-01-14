@@ -16,7 +16,7 @@ jobs:
           fetch-depth: 0
 
       -  name: mvn goal
-         run: mvn clean deploy sonar:sonar
+         run: mvn clean sonar:sonar
 
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@master
