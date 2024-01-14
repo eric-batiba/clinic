@@ -47,9 +47,11 @@ jobs:
 
    # - name: remove pom.xml
    #   run: rm -f pom.xml
-   # - name: sonar goal with maven
-   #   run: |
-   #     mvn --batch-mode --update-snapshots verify -B verify sonar:sonar
+    - name: sonar goal with maven
+      run: |
+        mvn --batch-mode --update-snapshots verify -B verify sonar:sonar
+        -Dsonar.host.url=https://sonarcloud.io
+        
 
     - name: SonarCloud Scan
       uses: sonarsource/sonarcloud-github-action@master
