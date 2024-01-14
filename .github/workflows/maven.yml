@@ -45,11 +45,11 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
-    - name: Remove pom
-      run: rm -f pom.xml
+    - name: sonar maven
+      run: mvn clean verify sonar:sonar
 
     - name: SonarCloud Scan
-      run: mvn clean verify sonar:sonar
+
       uses: sonarsource/sonarcloud-github-action@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
