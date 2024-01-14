@@ -56,7 +56,7 @@ jobs:
       with:
         args: >
           -Dsonar.organization=eric-batiba
-          -Dsonar.projectKey=clinic
+          -Dsonar.projectKey=eric-batiba
 
     - name: Build with Maven
       run: |
