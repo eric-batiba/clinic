@@ -45,8 +45,8 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
-    - name: Remove pom
-      run: rm -f pom.xml
+    #- name: Remove pom
+    #  run: rm -f pom.xml
 
     - name: SonarCloud Scan
       uses: sonarsource/sonarcloud-github-action@master
